@@ -1,0 +1,5 @@
+{
+  "name": "buzzer",
+  "private": true,
+  "workspaces": ["client", "server"]
+}
