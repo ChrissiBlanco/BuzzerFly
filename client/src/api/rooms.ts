@@ -1,4 +1,27 @@
-const API = (import.meta.env.VITE_BACKEND_URL ?? "") + "/api";
+const API =
+  (import.meta.env.VITE_BACKEND_URL ?? "").replace(/\/$/, "") + "/api";
+
+const FETCH_TIMEOUT_MS = 15000;
+
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit & { timeout?: number } = {}
+): Promise<Response> {
+  const { timeout = FETCH_TIMEOUT_MS, ...init } = options;
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    const res = await fetch(url, { ...init, signal: controller.signal });
+    return res;
+  } catch (e) {
+    if (e instanceof Error && e.name === "AbortError") {
+      throw new Error("Server did not respond in time. Check your connection and that the backend is running.");
+    }
+    throw e;
+  } finally {
+    clearTimeout(id);
+  }
+}
 
 export type Room = {
   id: string;
@@ -25,7 +48,7 @@ export type Question = {
 };
 
 export async function ensureUser(): Promise<{ userId: string }> {
-  const res = await fetch(`${API}/users`, {
+  const res = await fetchWithTimeout(`${API}/users`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -35,13 +58,13 @@ export async function ensureUser(): Promise<{ userId: string }> {
 }
 
 export async function getMyRooms(): Promise<{ rooms: Room[] }> {
-  const res = await fetch(`${API}/me/rooms`, { credentials: "include" });
+  const res = await fetchWithTimeout(`${API}/me/rooms`, { credentials: "include" });
   if (!res.ok) throw new Error("Failed to list rooms");
   return res.json();
 }
 
 export async function createRoom(name?: string): Promise<{ slug: string; adminToken: string; roomId: string; room: Room }> {
-  const res = await fetch(`${API}/rooms`, {
+  const res = await fetchWithTimeout(`${API}/rooms`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -55,7 +78,7 @@ export async function createRoom(name?: string): Promise<{ slug: string; adminTo
 }
 
 export async function getRoom(slug: string): Promise<Room> {
-  const res = await fetch(`${API}/rooms/${slug}`, { credentials: "include" });
+  const res = await fetchWithTimeout(`${API}/rooms/${slug}`, { credentials: "include" });
   if (!res.ok) {
     if (res.status === 404) throw new Error("Room not found");
     throw new Error("Failed to load room");
@@ -64,7 +87,7 @@ export async function getRoom(slug: string): Promise<Room> {
 }
 
 export async function updateRoomName(slug: string, name: string, adminToken: string): Promise<Room> {
-  const res = await fetch(`${API}/rooms/${slug}`, {
+  const res = await fetchWithTimeout(`${API}/rooms/${slug}`, {
     method: "PATCH",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -75,7 +98,7 @@ export async function updateRoomName(slug: string, name: string, adminToken: str
 }
 
 export async function createRound(slug: string, name: string, adminToken: string): Promise<Round> {
-  const res = await fetch(`${API}/rooms/${slug}/rounds`, {
+  const res = await fetchWithTimeout(`${API}/rooms/${slug}/rounds`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -90,7 +113,7 @@ export async function deleteRound(
   roundId: string,
   adminToken: string
 ): Promise<void> {
-  const res = await fetch(`${API}/rooms/${slug}/rounds/${roundId}`, {
+  const res = await fetchWithTimeout(`${API}/rooms/${slug}/rounds/${roundId}`, {
     method: "DELETE",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -109,7 +132,7 @@ export async function addQuestions(
     ? { text: questions[0].text }
     : { questions };
   if (adminToken) body.adminToken = adminToken;
-  const res = await fetch(`${API}/rooms/${slug}/rounds/${roundId}/questions`, {
+  const res = await fetchWithTimeout(`${API}/rooms/${slug}/rounds/${roundId}/questions`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -126,7 +149,7 @@ export async function updateQuestion(
   data: { text?: string; order?: number },
   adminToken: string
 ): Promise<Question> {
-  const res = await fetch(
+  const res = await fetchWithTimeout(
     `${API}/rooms/${slug}/rounds/${roundId}/questions/${questionId}`,
     {
       method: "PATCH",
@@ -145,7 +168,7 @@ export async function deleteQuestion(
   questionId: string,
   adminToken: string
 ): Promise<void> {
-  const res = await fetch(
+  const res = await fetchWithTimeout(
     `${API}/rooms/${slug}/rounds/${roundId}/questions/${questionId}`,
     {
       method: "DELETE",

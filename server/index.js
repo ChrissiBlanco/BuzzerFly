@@ -14,7 +14,8 @@ import { registerSocketHandlers } from "./socket/handlers.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT ?? 3001;
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? "http://localhost:5173";
+// Normalize: browser sends Origin without trailing slash; env might have one
+const CLIENT_ORIGIN = (process.env.CLIENT_ORIGIN ?? "http://localhost:5173").replace(/\/$/, "");
 
 const app = express();
 const httpServer = createServer(app);
