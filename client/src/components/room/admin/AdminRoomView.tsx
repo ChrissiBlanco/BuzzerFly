@@ -53,7 +53,6 @@ export default function AdminRoomView({
   roomNameEdit,
   setRoomNameEdit,
   onSaveRoomName,
-  savingRoomName,
   onAddRoundWithName,
   addingRound,
   onSetActiveRound,
