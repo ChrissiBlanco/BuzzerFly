@@ -30,7 +30,7 @@ export default function AdminRunMode({
 }: Props) {
   return (
     <section className="mb-8">
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div className="flex flex-wrap gap-2 mb-10">
         {rounds.map((round, i) => (
           <button
             key={i}
@@ -38,7 +38,7 @@ export default function AdminRunMode({
             onClick={() => onSetActiveRound(round.id)}
             className={`px-4 py-2 rounded-playful text-sm font-semibold transition ${
               activeRound?.id === round.id
-                ? "bg-buzz-red text-white shadow-playful"
+                ? "bg-black/50 border-2 border-buzz-yellow text-buzz-yellow bg-buzz-yellow/20"
                 : "bg-black/50 border-2 border-buzz-yellow/50 text-buzz-yellow hover:border-buzz-yellow"
             }`}
           >
@@ -51,8 +51,8 @@ export default function AdminRunMode({
           No questions in this round. Switch to Edit to add some.
         </p>
       ) : (
-        <div className="mt-6">
-          <div className="rounded-playful border-2 border-buzz-yellow/50 bg-black/50 p-6 mb-4">
+        <div className="mt-10">
+          <div className="rounded-playful border-2 border-buzz-yellow/50 bg-black/50 p-8">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <span className="font-mono text-buzz-yellow/80">
                 {currentIndex + 1}
@@ -70,9 +70,6 @@ export default function AdminRunMode({
                 </div>
               ) : (
                 <>
-                  <span className="text-yellow-200/50 flex-1">
-                    Question hidden
-                  </span>
                   <button
                     onClick={onReveal}
                     className="px-3 py-1.5 bg-buzz-red hover:bg-buzz-red-light text-white rounded-playful text-sm font-semibold shadow-playful"
@@ -87,7 +84,7 @@ export default function AdminRunMode({
             <button
               onClick={onPrevQuestion}
               disabled={currentIndex <= 0}
-              className="px-4 py-2 bg-buzz-yellow hover:bg-buzz-yellow-light text-buzz-black rounded-playful font-semibold disabled:opacity-50 shadow-playful active:scale-[0.98] text-xl"
+              className="px-4 py-2 bg-transparent hover:bg-buzz-yellow/20 text-buzz-yellow rounded-playful font-semibold disabled:opacity-50 active:scale-[0.98] text-xl"
               title="Previous question"
               aria-label="Previous question"
             >
@@ -96,7 +93,7 @@ export default function AdminRunMode({
             <button
               onClick={onNextQuestion}
               disabled={currentIndex >= questions.length - 1}
-              className="px-4 py-2 bg-buzz-yellow hover:bg-buzz-yellow-light text-buzz-black rounded-playful font-semibold disabled:opacity-50 shadow-playful active:scale-[0.98] text-xl"
+              className="px-4 py-2 bg-transparent hover:bg-buzz-yellow/20 text-buzz-yellow rounded-playful font-semibold disabled:opacity-50 active:scale-[0.98] text-xl"
               title="Next question"
               aria-label="Next question"
             >

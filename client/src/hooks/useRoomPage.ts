@@ -146,9 +146,36 @@ export function useRoomPage(slug: string | null) {
     try {
       const round = await createRound(slug, newRoundName.trim(), adminToken);
       setRoom((r) =>
-        r ? { ...r, rounds: [...(r.rounds ?? []), round].sort((a, b) => a.order - b.order) } : null
+        r
+          ? {
+              ...r,
+              rounds: [...(r.rounds ?? []), { ...round, questions: round.questions ?? [] }].sort(
+                (a, b) => a.order - b.order
+              ),
+            }
+          : null
       );
       setNewRoundName("");
+    } catch (_) {}
+    setAddingRound(false);
+  }
+
+  async function handleAddRoundWithName(name: string) {
+    const trimmed = name.trim();
+    if (!slug || !trimmed || !adminToken) return;
+    setAddingRound(true);
+    try {
+      const round = await createRound(slug, trimmed, adminToken);
+      setRoom((r) =>
+        r
+          ? {
+              ...r,
+              rounds: [...(r.rounds ?? []), { ...round, questions: round.questions ?? [] }].sort(
+                (a, b) => a.order - b.order
+              ),
+            }
+          : null
+      );
     } catch (_) {}
     setAddingRound(false);
   }
@@ -170,7 +197,7 @@ export function useRoomPage(slug: string | null) {
           round.id === activeRound.id
             ? {
                 ...round,
-                questions: [...round.questions, ...newQuestions].sort((a, b) => a.order - b.order),
+                questions: [...(round.questions ?? []), ...newQuestions].sort((a, b) => a.order - b.order),
               }
             : round
         );
@@ -208,7 +235,7 @@ export function useRoomPage(slug: string | null) {
           round.id === activeRound.id
             ? {
                 ...round,
-                questions: round.questions.map((q) =>
+                questions: (round.questions ?? []).map((q) =>
                   q.id === questionId ? { ...q, text: updated.text } : q
                 ),
               }
@@ -229,7 +256,7 @@ export function useRoomPage(slug: string | null) {
         if (!r) return r;
         const rounds = r.rounds.map((round) =>
           round.id === activeRound.id
-            ? { ...round, questions: round.questions.filter((q) => q.id !== questionId) }
+            ? { ...round, questions: (round.questions ?? []).filter((q) => q.id !== questionId) }
             : round
         );
         return { ...r, rounds };
@@ -322,6 +349,7 @@ export function useRoomPage(slug: string | null) {
     newRoundName,
     setNewRoundName,
     onAddRound: handleAddRound,
+    onAddRoundWithName: handleAddRoundWithName,
     addingRound,
     onSetActiveRound: handleSetActiveRound,
     onDeleteRound: handleDeleteRound,
