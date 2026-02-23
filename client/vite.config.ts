@@ -14,8 +14,14 @@ export default defineConfig({
         ws: true,
         changeOrigin: true,
         configure(proxy) {
-          proxy.on("error", (err) => {
-            console.warn("[vite] Proxy error (start the backend with: cd server && npm run dev):", err.message);
+          proxy.on("error", (err: NodeJS.ErrnoException) => {
+            if (err.code === "ECONNREFUSED") {
+              console.warn("[vite] Backend not running? Start it with: cd server && npm run dev");
+            } else if (err.code === "EPIPE") {
+              // Benign: connection closed (e.g. backend restarted or client disconnected)
+            } else {
+              console.warn("[vite] Proxy error:", err.message);
+            }
           });
         },
       },

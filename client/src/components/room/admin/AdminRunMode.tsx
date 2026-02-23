@@ -26,7 +26,6 @@ export default function AdminRunMode({
   onReveal,
   onPrevQuestion,
   onNextQuestion,
-  onSetCurrentQuestion,
   onSetActiveRound,
 }: Props) {
   return (
