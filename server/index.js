@@ -37,7 +37,12 @@ const io = new Server(httpServer, {
 });
 
 app.use(cookieParser());
-app.use(cors({ origin: (req, cb) => cb(null, allowedOrigins(req.headers.origin)), credentials: true }));
+app.use(
+  cors({
+    origin: (req, cb) => cb(null, req?.headers?.origin ? allowedOrigins(req.headers.origin) : CLIENT_ORIGIN),
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.get("/api/health", (req, res) => res.json({ ok: true }));
