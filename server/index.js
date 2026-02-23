@@ -1,6 +1,9 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import path from "path";
+import { fileURLToPath } from "url";
+import { existsSync } from "fs";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import usersRouter from "./routes/users.js";
@@ -9,6 +12,7 @@ import roundsRouter from "./routes/rounds.js";
 import questionsRouter from "./routes/questions.js";
 import { registerSocketHandlers } from "./socket/handlers.js";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT ?? 3001;
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? "http://localhost:5173";
 
@@ -28,6 +32,15 @@ app.use("/api/users", usersRouter);
 app.use("/api", roomsRouter);
 app.use("/api/rooms", roundsRouter);
 app.use("/api/rooms", questionsRouter);
+
+// Option A (single-app): serve built React app when client/dist exists
+const clientDist = path.join(__dirname, "..", "client", "dist");
+if (existsSync(clientDist)) {
+  app.use(express.static(clientDist));
+  app.get("*", (req, res) => {
+    res.sendFile("index.html", { root: clientDist });
+  });
+}
 
 registerSocketHandlers(io);
 

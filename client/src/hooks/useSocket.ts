@@ -14,7 +14,8 @@ export type RoomState = {
 export type Participant = { id: string; name: string };
 
 const SOCKET_URL =
-  typeof window !== "undefined" ? window.location.origin : "http://localhost:5173";
+  import.meta.env.VITE_BACKEND_URL ??
+  (typeof window !== "undefined" ? window.location.origin : "http://localhost:5173");
 
 export function useSocket(slug: string | null, name: string | null, isAdmin: boolean, adminToken: string | null) {
   const socketRef = useRef<Socket | null>(null);
