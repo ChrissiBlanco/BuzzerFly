@@ -17,15 +17,27 @@ const PORT = process.env.PORT ?? 3001;
 // Normalize: browser sends Origin without trailing slash; env might have one
 const CLIENT_ORIGIN = (process.env.CLIENT_ORIGIN ?? "http://localhost:5173").replace(/\/$/, "");
 
+// Allow both www and non-www so https://buzzerfly.org and https://www.buzzerfly.org both work
+function allowedOrigins(origin) {
+  const list = [CLIENT_ORIGIN];
+  const other =
+    CLIENT_ORIGIN.includes("://www.") ? CLIENT_ORIGIN.replace("://www.", "://") : CLIENT_ORIGIN.replace("://", "://www.");
+  if (!list.includes(other)) list.push(other);
+  return list.includes(origin) ? origin : null;
+}
+
 const app = express();
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
-  cors: { origin: CLIENT_ORIGIN, methods: ["GET", "POST"] },
+  cors: {
+    origin: (origin, cb) => cb(null, allowedOrigins(origin)),
+    methods: ["GET", "POST"],
+  },
 });
 
 app.use(cookieParser());
-app.use(cors({ origin: CLIENT_ORIGIN, credentials: true }));
+app.use(cors({ origin: (req, cb) => cb(null, allowedOrigins(req.headers.origin)), credentials: true }));
 app.use(express.json());
 
 app.get("/api/health", (req, res) => res.json({ ok: true }));
