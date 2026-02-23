@@ -1,4 +1,4 @@
-const API = "/api";
+const API = (import.meta.env.VITE_BACKEND_URL ?? "") + "/api";
 
 export type Room = {
   id: string;
