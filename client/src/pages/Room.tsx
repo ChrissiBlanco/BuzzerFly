@@ -50,9 +50,7 @@ export default function RoomPage() {
         setRoomNameEdit={state.setRoomNameEdit}
         onSaveRoomName={state.onSaveRoomName}
         savingRoomName={state.savingRoomName}
-        newRoundName={state.newRoundName}
-        setNewRoundName={state.setNewRoundName}
-        onAddRound={state.onAddRound}
+        onAddRoundWithName={state.onAddRoundWithName}
         addingRound={state.addingRound}
         onSetActiveRound={state.onSetActiveRound}
         onDeleteRound={state.onDeleteRound}

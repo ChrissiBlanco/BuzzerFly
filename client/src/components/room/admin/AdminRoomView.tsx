@@ -21,9 +21,7 @@ type Props = {
   setRoomNameEdit: (value: string) => void;
   onSaveRoomName: () => void;
   savingRoomName: boolean;
-  newRoundName: string;
-  setNewRoundName: (value: string) => void;
-  onAddRound: () => void;
+  onAddRoundWithName: (name: string) => void;
   addingRound: boolean;
   onSetActiveRound: (roundId: string) => void;
   onDeleteRound: (roundId: string) => void;
@@ -56,9 +54,7 @@ export default function AdminRoomView({
   setRoomNameEdit,
   onSaveRoomName,
   savingRoomName,
-  newRoundName,
-  setNewRoundName,
-  onAddRound,
+  onAddRoundWithName,
   addingRound,
   onSetActiveRound,
   onDeleteRound,
@@ -100,10 +96,7 @@ export default function AdminRoomView({
             roomNameEdit={roomNameEdit}
             onRoomNameEditChange={setRoomNameEdit}
             onSaveRoomName={onSaveRoomName}
-            savingRoomName={savingRoomName}
-            newRoundName={newRoundName}
-            onNewRoundNameChange={setNewRoundName}
-            onAddRound={onAddRound}
+            onAddRoundWithName={onAddRoundWithName}
             addingRound={addingRound}
             onSetActiveRound={onSetActiveRound}
             onDeleteRound={onDeleteRound}
@@ -137,7 +130,10 @@ export default function AdminRoomView({
           )
         )}
 
-        <ParticipantsList participants={participants} buzzedName={buzzedName} />
+        {!isEditMode && (
+          <ParticipantsList participants={participants} buzzedName={buzzedName} />
+        )}
+        
       </div>
     </div>
   );
