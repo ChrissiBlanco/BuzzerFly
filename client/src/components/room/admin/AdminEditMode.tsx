@@ -50,7 +50,6 @@ export default function AdminEditMode({
   onUpdateQuestion,
   onDeleteQuestion,
   savingQuestionId,
-  onNextQuestion,
 }: Props) {
   return (
     <>
@@ -162,14 +161,6 @@ export default function AdminEditMode({
               />
             ))}
           </div>
-          {questions.length > 0 && (
-            <button
-              onClick={onNextQuestion}
-              className="px-4 py-2 bg-buzz-yellow hover:bg-buzz-yellow-light text-buzz-black font-semibold rounded-playful shadow-playful active:scale-[0.98]"
-            >
-              Next question
-            </button>
-          )}
         </section>
       )}
     </>

@@ -17,7 +17,7 @@ export default function AdminHeader({
     <>
       <a
         href="/"
-        className="inline-block text-buzz-yellow hover:text-buzz-yellow-light underline underline-offset-2 mb-4"
+        className="inline-block text-buzz-yellow hover:text-buzz-yellow-light mb-4"
       >
         ←
       </a>

@@ -21,9 +21,9 @@ export default function ParticipantView({
     <div className="min-h-screen bg-buzz-black text-white flex flex-col items-center justify-center p-6">
       <a
         href="/"
-        className="absolute top-6 left-6 text-buzz-yellow hover:text-buzz-yellow-light underline underline-offset-2"
+        className="absolute top-6 left-6 text-buzz-yellow hover:text-buzz-yellow-light"
       >
-        ← Back to overview
+        ←
       </a>
       {!connected && <p className="text-buzz-yellow text-sm mb-4">Connecting…</p>}
       <div className="text-center max-w-lg">

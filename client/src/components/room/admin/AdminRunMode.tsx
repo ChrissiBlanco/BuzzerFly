@@ -53,7 +53,7 @@ export default function AdminRunMode({
         </p>
       ) : (
         <div className="mt-6">
-          <div className="rounded-playful border-2 border-buzz-yellow/50 bg-black/50 p-6 mb-4 min-h-[8rem]">
+          <div className="rounded-playful border-2 border-buzz-yellow/50 bg-black/50 p-6 mb-4">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <span className="font-mono text-buzz-yellow/80">
                 {currentIndex + 1}
@@ -86,15 +86,6 @@ export default function AdminRunMode({
           </div>
           <div className="flex items-center justify-between mb-4">
             <button
-              onClick={onNextQuestion}
-              disabled={currentIndex >= questions.length - 1}
-              className="px-4 py-2 bg-buzz-yellow hover:bg-buzz-yellow-light text-buzz-black rounded-playful font-semibold disabled:opacity-50 shadow-playful active:scale-[0.98] text-xl"
-              title="Next question"
-              aria-label="Next question"
-            >
-              →
-            </button>
-            <button
               onClick={onPrevQuestion}
               disabled={currentIndex <= 0}
               className="px-4 py-2 bg-buzz-yellow hover:bg-buzz-yellow-light text-buzz-black rounded-playful font-semibold disabled:opacity-50 shadow-playful active:scale-[0.98] text-xl"
@@ -102,6 +93,15 @@ export default function AdminRunMode({
               aria-label="Previous question"
             >
               ←
+            </button>
+            <button
+              onClick={onNextQuestion}
+              disabled={currentIndex >= questions.length - 1}
+              className="px-4 py-2 bg-buzz-yellow hover:bg-buzz-yellow-light text-buzz-black rounded-playful font-semibold disabled:opacity-50 shadow-playful active:scale-[0.98] text-xl"
+              title="Next question"
+              aria-label="Next question"
+            >
+              →
             </button>
           </div>
         </div>
