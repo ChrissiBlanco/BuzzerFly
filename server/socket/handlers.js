@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import { prisma } from "../lib/prisma.js";
+import { ADMIN_TOKEN_PREFIX } from "../lib/constants.js";
 import {
   roomStates,
   participantsByRoom,
@@ -11,9 +12,7 @@ import {
   removeParticipant,
   getParticipants,
   isAdmin,
-} from "../store.js";
-
-const ADMIN_TOKEN_PREFIX = "buzzer_admin_";
+} from "./store.js";
 
 /**
  * Build room_state payload for a slug (include activeRoundName, questionText from DB)

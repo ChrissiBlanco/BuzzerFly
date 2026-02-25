@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
+import { USER_COOKIE } from "../lib/constants.js";
 
 const router = Router();
-const USER_COOKIE = "buzzer_user_id";
 const COOKIE_MAX_AGE = 365 * 24 * 60 * 60 * 1000; // 1 year
 
 // Cross-origin (e.g. Amplify → EB): cookie must be SameSite=None; Secure so the browser sends it

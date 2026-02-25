@@ -1,10 +1,9 @@
 import { Router } from "express";
 import { nanoid } from "nanoid";
 import { prisma } from "../lib/prisma.js";
+import { USER_COOKIE, ADMIN_TOKEN_PREFIX } from "../lib/constants.js";
 
 const router = Router();
-const USER_COOKIE = "buzzer_user_id";
-const ADMIN_TOKEN_PREFIX = "buzzer_admin_";
 
 // Mount this router at /api so: GET /api/me/rooms, POST /api/rooms, GET /api/rooms/:slug
 
@@ -123,5 +122,4 @@ export async function getRoomAndVerifyAdmin(req, slug) {
   return { room };
 }
 
-export const ADMIN_TOKEN_PREFIX_EXPORT = ADMIN_TOKEN_PREFIX;
 export default router;
