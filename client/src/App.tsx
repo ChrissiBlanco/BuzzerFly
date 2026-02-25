@@ -1,14 +1,17 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home.tsx";
-import Room from "./pages/Room.tsx";
+import { AppServicesProvider } from "./presentation/context/AppContext";
+import Home from "./presentation/pages/Home";
+import Room from "./presentation/pages/Room";
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/room/:slug" element={<Room />} />
-      </Routes>
-    </BrowserRouter>
+    <AppServicesProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/room/:slug" element={<Room />} />
+        </Routes>
+      </BrowserRouter>
+    </AppServicesProvider>
   );
 }
