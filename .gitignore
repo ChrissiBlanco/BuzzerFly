@@ -4,8 +4,10 @@ node_modules/
 # Build output
 client/dist/
 
-# Environment
+# Environment (never commit secrets)
 .env
+**/.env
+server/.env
 .env.local
 .env.*.local
 
