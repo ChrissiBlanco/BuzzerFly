@@ -18,16 +18,16 @@ Images are sized for comfortable viewing on typical laptop widths (about 560px w
   <img src="docs/screenshots/editor.png" alt="Room editor with rounds and questions" width="560" />
 </p>
 
-### Host — live room (question revealed, buzzer state)
-
-<p align="center">
-  <img src="docs/screenshots/host-room.png" alt="Host view with question, round tabs, and first buzz" width="560" />
-</p>
-
 ### Host — before reveal
 
 <p align="center">
   <img src="docs/screenshots/host-reveal.png" alt="Host view with reveal control for the next question" width="560" />
+</p>
+
+### Host — live room (question revealed, buzzer state)
+
+<p align="center">
+  <img src="docs/screenshots/host-room.png" alt="Host view with question, round tabs, and first buzz" width="560" />
 </p>
 
 ### Player — waiting for question
