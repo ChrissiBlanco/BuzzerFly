@@ -13,7 +13,12 @@ import questionsRouter from "./routes/questions.js";
 import { registerSocketHandlers } from "./socket/handlers.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = process.env.PORT ?? 3001;
+// Fly proxy uses fly.toml `internal_port` (8080). Prefer explicit PORT; on Fly VMs default to 8080
+// when PORT is missing (Fly does not always inject it). Unset any PORT secret that isn’t 8080.
+const onFly = Boolean(process.env.FLY_MACHINE_ID);
+const parsedPort = Number(process.env.PORT);
+const PORT =
+  Number.isFinite(parsedPort) && parsedPort > 0 ? parsedPort : onFly ? 8080 : 3001;
 // Normalize: browser sends Origin without trailing slash; env might have one
 const CLIENT_ORIGIN = (process.env.CLIENT_ORIGIN ?? "http://localhost:5173").replace(/\/$/, "");
 

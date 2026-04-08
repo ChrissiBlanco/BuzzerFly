@@ -2,6 +2,46 @@
 
 A web app for room-based quiz rounds: an admin creates rooms with named rounds and question cards, shares a link, and participants join to see the round name until the admin reveals a question—then the buzzer activates.
 
+## Screenshots
+
+Images are sized for comfortable viewing on typical laptop widths (about 560px wide); they remain readable in the GitHub viewer and on smaller screens.
+
+### Home
+
+<p align="center">
+  <img src="docs/screenshots/home.png" alt="Home screen with Create room, join field, and My rooms" width="560" />
+</p>
+
+### Host — edit room
+
+<p align="center">
+  <img src="docs/screenshots/editor.png" alt="Room editor with rounds and questions" width="560" />
+</p>
+
+### Host — live room (question revealed, buzzer state)
+
+<p align="center">
+  <img src="docs/screenshots/host-room.png" alt="Host view with question, round tabs, and first buzz" width="560" />
+</p>
+
+### Host — before reveal
+
+<p align="center">
+  <img src="docs/screenshots/host-reveal.png" alt="Host view with reveal control for the next question" width="560" />
+</p>
+
+### Player — waiting for question
+
+<p align="center">
+  <img src="docs/screenshots/player-waiting.png" alt="Player buzzer while waiting for the question to be revealed" width="560" />
+</p>
+
+### Player — question visible
+
+<p align="center">
+  <img src="docs/screenshots/player-buzz.png" alt="Player buzzer with revealed question text" width="560" />
+</p>
+
 ## Stack
 
 - **Frontend**: React (Vite) + TypeScript + Tailwind CSS + React Router
@@ -14,10 +54,11 @@ This repo is an **npm workspace** with `client` and `server` packages. Run `npm 
 
 ### 1. PostgreSQL
 
-Create a database, then copy `server/.env.example` to `server/.env` and adjust values:
+Create a database, then copy `server/.env.example` to `server/.env` and adjust values. For **Neon**, use a pooled `DATABASE_URL` and a direct `DIRECT_URL` as in the example file.
 
 ```
-DATABASE_URL="postgresql://user:password@localhost:5432/buzzer?schema=public"
+DATABASE_URL="postgresql://…"
+DIRECT_URL="postgresql://…"
 PORT=3001
 CLIENT_ORIGIN=http://localhost:5173
 ```
