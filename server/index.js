@@ -62,6 +62,7 @@ if (existsSync(clientDist)) {
 
 registerSocketHandlers(io);
 
-httpServer.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+const HOST = process.env.HOST ?? "0.0.0.0";
+httpServer.listen(PORT, HOST, () => {
+  console.log(`Server running at http://${HOST}:${PORT}`);
 });
