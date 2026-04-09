@@ -1,10 +1,10 @@
-# Buzzer
+# BuzzerFly
 
-A web app for room-based quiz rounds: an admin creates rooms with named rounds and question cards, shares a link, and participants join to see the round name until the admin reveals a question—then the buzzer activates.
+BuzzerFly is a full-stack web app for hosting live quiz sessions: a game master creates rooms with rounds and question cards, shares a link, and participants join in the browser. State is synchronized in real time over WebSockets so buzzes and reveal events propagate immediately. Rooms, rounds, and questions are stored in PostgreSQL so a session can be prepared ahead of time and resumed across restarts.
 
 ## Screenshots
 
-Images are sized for comfortable viewing on typical laptop widths (about 560px wide); they remain readable in the GitHub viewer and on smaller screens.
+Images are sized for comfortable viewing on typical laptop widths (~560px); they remain readable in the GitHub viewer and on smaller screens.
 
 ### Home
 
@@ -42,41 +42,76 @@ Images are sized for comfortable viewing on typical laptop widths (about 560px w
   <img src="docs/screenshots/player-buzz.png" alt="Player buzzer with revealed question text" width="560" />
 </p>
 
-## Stack
+## Architecture
 
-- **Frontend**: React (Vite) + TypeScript + Tailwind CSS + React Router
-- **Backend**: Node.js + Express + Socket.io
-- **Database**: PostgreSQL with Prisma
+The repository is an **npm workspace** with two packages: `client` (Vite + React) and `server` (Express). In development, the Vite dev server proxies `/api` and `/socket.io` to the backend so the browser talks to a single origin; production can serve the built SPA from the same Node process or split static hosting from the API.
 
-This repo is an **npm workspace** with `client` and `server` packages. Run `npm install` once from the repository root to install both.
+**HTTP:** REST endpoints under `/api` handle CRUD for rooms, rounds, and questions. The server validates input, persists via Prisma, and returns JSON.
 
-## Setup
+**Real time:** Socket.io runs on the same Node host as Express. Clients connect with credentials aligned to `CLIENT_ORIGIN` (CORS and Socket.io configuration). Game events—room joins, question reveal, buzz attempts, and ordering—are emitted as Socket.io events so all connected clients update without polling. The server remains the source of truth for buzz order and round visibility.
 
-### 1. PostgreSQL
+**Data:** Prisma maps the schema to PostgreSQL and generates a type-safe client used only on the server. Migrations live under `server/prisma/migrations`. Hosted Postgres (e.g. Neon) typically uses a **pooled** `DATABASE_URL` for runtime queries and a **direct** `DIRECT_URL` for migrations; both are referenced from `server/.env`.
 
-Create a database, then copy `server/.env.example` to `server/.env` and adjust values. For **Neon**, use a pooled `DATABASE_URL` and a direct `DIRECT_URL` as in the example file.
+## Tech stack
 
-```
-DATABASE_URL="postgresql://…"
-DIRECT_URL="postgresql://…"
-PORT=3001
-CLIENT_ORIGIN=http://localhost:5173
-```
+### Frontend
 
-`CLIENT_ORIGIN` must match the URL users open in the browser (used for CORS and Socket.io). The server also accepts the corresponding `www` / non-`www` variant when they differ.
+| Technology | Purpose |
+|------------|---------|
+| React | UI components and client-side state |
+| TypeScript | Static typing across the client codebase |
+| Vite | Dev server, HMR, and production bundling |
+| Tailwind CSS | Utility-first styling |
+| React Router | Client-side routing for the SPA |
 
-### 2. Install and migrate
+### Backend
 
-From the project root:
+| Technology | Purpose |
+|------------|---------|
+| Node.js | Runtime for the API and Socket.io server |
+| Express | HTTP server and `/api` route handlers |
+| Socket.io | Bidirectional WebSocket channel for live room and buzzer updates |
+
+### Database
+
+| Technology | Purpose |
+|------------|---------|
+| PostgreSQL | Relational storage for rooms, rounds, questions, and session-related data |
+| Prisma | Schema definition, migrations, and type-safe database access from Node |
+
+## Getting started
+
+### Prerequisites
+
+- Node.js (version compatible with the lockfile / engines if specified)
+- PostgreSQL (local or hosted; Neon-style pooled + direct URLs are supported)
+
+### Environment variables
+
+Copy `server/.env.example` to `server/.env` and adjust:
+
+| Variable | Role |
+|----------|------|
+| `DATABASE_URL` | Pooled PostgreSQL URL for the running app (Prisma datasource) |
+| `DIRECT_URL` | Direct PostgreSQL URL for migrations when the pooler does not support them |
+| `PORT` | API listen port (default `3001` locally; on Fly.io, align with `fly.toml` / platform expectations) |
+| `HOST` | Bind address (e.g. `0.0.0.0` when exposing outside localhost) |
+| `CLIENT_ORIGIN` | Browser origin of the SPA (CORS and Socket.io); must match the URL users open; the server may accept related `www` / non-`www` variants when they differ |
+
+See comments in `server/.env.example` for Neon pooling, SSL, and Fly.io port notes.
+
+### Install and database migrate
+
+From the repository root:
 
 ```bash
 npm install
 cd server && npm run db:migrate -- --name init
 ```
 
-For later schema changes, run `cd server && npm run db:migrate` and follow the Prisma prompts (or use `npm run db:push` for prototyping without migrations). `npm run db:generate` in `server` regenerates the Prisma client after schema changes.
+For schema tweaks later: `cd server && npm run db:migrate` (Prisma prompts) or `npm run db:push` for prototyping. After schema changes, `npm run db:generate` in `server` refreshes the Prisma client.
 
-### 3. Run (development)
+### Run (development)
 
 **Terminal 1 — API and WebSockets**
 
@@ -84,37 +119,30 @@ For later schema changes, run `cd server && npm run db:migrate` and follow the P
 cd server && npm run dev
 ```
 
-**Terminal 2 — Vite dev server**
+**Terminal 2 — Vite**
 
 ```bash
 cd client && npm run dev
 ```
 
-The Vite config proxies `/api` and `/socket.io` to `http://localhost:3001`, so you usually do **not** need a client `.env` for local dev.
+Open `http://localhost:5173`. With the default Vite proxy, you do not need a client `.env` for local API and Socket.io traffic.
 
-Open [http://localhost:5173](http://localhost:5173). Create a room, add rounds and questions, share the room link, and join as a participant to use the buzzer.
+### Production (single host)
 
-## Production / single host
-
-1. Set `server/.env` (or your host’s env) with a production `DATABASE_URL`, `PORT`, and `CLIENT_ORIGIN` pointing at your public site URL.
+1. Set production `DATABASE_URL`, `PORT`, and `CLIENT_ORIGIN` on the server.
 2. Build the client: `cd client && npm run build`.
 3. Start the server: `cd server && npm start`.
 
-If `client/dist` exists next to `server`, the server serves the built React app and handles routing for the SPA.
+If `client/dist` exists beside `server`, the server can serve the SPA and handle SPA routing. If the static site is hosted separately, build the client with `VITE_BACKEND_URL` set to the API origin (no trailing slash), e.g. `VITE_BACKEND_URL=https://api.example.com npm run build`.
 
-If the static files are hosted separately from the API, build the client with `VITE_BACKEND_URL` set to your API origin (no trailing slash), e.g. `VITE_BACKEND_URL=https://api.example.com npm run build`, so REST calls and Socket.io use that host.
+Health check: `GET /api/health`.
 
-## Useful commands
+## Design decisions
 
-| Location | Command | Purpose |
-|----------|---------|---------|
-| `client` | `npm run dev` | Vite dev server |
-| `client` | `npm run build` | Typecheck + production bundle |
-| `client` | `npm run preview` | Preview production build locally |
-| `server` | `npm run dev` | API + sockets with `--watch` |
-| `server` | `npm start` | Run server without watch |
-| `server` | `npm run db:migrate` | Prisma migrate dev |
-| `server` | `npm run db:push` | Push schema without migration files |
-| `server` | `npm run db:generate` | `prisma generate` |
+- **Socket.io instead of HTTP polling:** Buzz order and reveal state are time-sensitive. Push-based events reduce latency and avoid thundering herds of poll requests; the server can broadcast one authoritative update to every client in a room.
 
-Health check: `GET /api/health` on the server.
+- **Prisma instead of handwritten SQL:** The schema is versioned with migrations, and the generated client matches TypeScript types used in Express handlers. That lowers foot-guns when evolving rooms, rounds, and questions and keeps refactors grep-friendly.
+
+- **PostgreSQL instead of an embedded or key-value store:** Quiz content is relational (rooms, rounds, cards) and benefits from constraints and durable ACID semantics. A managed Postgres tier is a straightforward fit for multi-room persistence and backups.
+
+- **Vite for the frontend:** Fast cold start and HMR improve iteration on UI flows; the production build outputs static assets the Node server—or any CDN—can serve without coupling to a specific React CLIserv configuration.
